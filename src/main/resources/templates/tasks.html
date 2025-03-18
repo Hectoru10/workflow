@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragments :: head}"></head>
-<body class="bg-light">
+<body data-bs-theme="light">
 <!-- Navbar -->
 <div th:replace="~{fragments/fragments :: navbar}"></div>
 
@@ -13,32 +13,56 @@
         </div>
         <div class="card-body">
             <a href="/tasks/new" class="btn btn-success mb-3">Create New Task</a>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Due Date</th>
-                    <th>Completed</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="task : ${tasks}">
-                    <td th:text="${task.title}"></td>
-                    <td th:text="${task.description}"></td>
-                    <td th:text="${task.dueDate}"></td>
-                    <td>
-                        <span th:if="${task.completed}" class="badge bg-success">Completed</span>
-                        <span th:unless="${task.completed}" class="badge bg-warning">Pending</span>
-                    </td>
-                    <td>
-                        <a th:href="@{/tasks/edit/{id}(id=${task.id})}" class="btn btn-sm btn-primary">Edit</a>
-                        <a th:href="@{/tasks/delete/{id}(id=${task.id})}" class="btn btn-sm btn-danger">Delete</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive"> <!-- Hace que la tabla sea responsive -->
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Due Date</th>
+                        <th>Completed</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="task : ${tasks.content}">
+                        <td th:text="${task.title}"></td>
+                        <td th:text="${task.description}"></td>
+                        <td style="white-space: nowrap;" th:text="${task.dueDate}"></td> <!-- Evita el salto de línea -->
+                        <td>
+                            <span th:if="${task.completed}" class="badge bg-success">Completed</span>
+                            <span th:unless="${task.completed}" class="badge bg-warning">Pending</span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a th:href="@{/tasks/edit/{id}(id=${task.id})}" class="btn btn-sm btn-primary me-2">Edit</a> <!-- Agrega espacio a la derecha -->
+                                <a th:href="@{/tasks/delete/{id}(id=${task.id})}" class="btn btn-sm btn-danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Controles de paginación -->
+            <nav th:if="${tasks.totalPages > 1}">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/tasks(page=0, size=${tasks.size})}">First</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/tasks(page=${currentPage - 1}, size=${tasks.size})}">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, tasks.totalPages - 1)}" th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/tasks(page=${i}, size=${tasks.size})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == tasks.totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/tasks(page=${currentPage + 1}, size=${tasks.size})}">Next</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == tasks.totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/tasks(page=${tasks.totalPages - 1}, size=${tasks.size})}">Last</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

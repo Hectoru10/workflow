@@ -4,6 +4,8 @@ import hu.workflow.model.Task;
 import hu.workflow.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,8 +19,14 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping
-    public String getAllTasks(Model model) {
-        model.addAttribute("tasks", taskService.getAllTasks());
+    public String getAllTasks(
+            @RequestParam(defaultValue = "0") int page, // Número de página (por defecto 0)
+            @RequestParam(defaultValue = "5") int size, // Tamaño de la página (por defecto 5)
+            Model model) {
+        Page<Task> tasks = taskService.getAllTasks(PageRequest.of(page, size)); // Obtiene la página de tareas
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", tasks.getTotalPages());
         return "tasks";
     }
 
