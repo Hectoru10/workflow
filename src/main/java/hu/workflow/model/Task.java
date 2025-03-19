@@ -2,6 +2,7 @@ package hu.workflow.model;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,16 +18,18 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Title is Required")
+    @Size(min = 3, max = 25, message = "Title must be between 3 and 25 characters")
     private String title;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Description is required")
+    @Size(min = 10, max = 500, message = "Description must be between 10 and 500 characters")
     private String description;
 
-    @Column(nullable = false)
+    @NotNull(message = "Due date is required")
+    @FutureOrPresent(message = "Due date must be today or in the future")
     private LocalDate dueDate;
 
-    @Column(nullable = false)
     private boolean completed;
 
 }

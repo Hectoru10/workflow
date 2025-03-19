@@ -2,9 +2,11 @@ package hu.workflow.controller;
 
 import hu.workflow.model.Task;
 import hu.workflow.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,9 +35,13 @@ public class TaskController {
 
     // Procesar la creación de una nueva tarea
     @PostMapping
-    public String createTask(@ModelAttribute("task") Task task) {
+    public String createTask(@Valid @ModelAttribute("task") Task task, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            // Si hay errores, se envía de vuelta al formulario con los mensajes de error
+            return "tasks/form";
+        }
         taskService.saveTask(task);
-        return "redirect:/tasks"; // Redirige a la lista de tareas
+        return "redirect:/tasks";
     }
 
     // Mostrar formulario para editar una tarea existente
@@ -49,7 +55,12 @@ public class TaskController {
 
     // Procesar la actualización de una tarea existente
     @PostMapping("/update/{id}")
-    public String updateTask(@PathVariable Long id, @ModelAttribute("task") Task updatedTask) {
+    public String updateTask(@PathVariable Long id, @Valid @ModelAttribute("task") Task updatedTask, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            // Si hay errores, se regresa al formulario con los mensajes
+            model.addAttribute("task", updatedTask);
+            return "tasks/form";
+        }
         Task existingTask = taskService.getTaskById(id).orElseThrow(() -> new RuntimeException("Task not found"));
         existingTask.setTitle(updatedTask.getTitle());
         existingTask.setDescription(updatedTask.getDescription());
