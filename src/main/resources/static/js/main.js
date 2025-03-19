@@ -1,3 +1,4 @@
+console.log('Funcionando');
 // Función para activar el modo oscuro
 const darkTheme = () => {
     const body = document.querySelector("body");
